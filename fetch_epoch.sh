@@ -4,30 +4,40 @@ set -euo pipefail
 
 EPOCH=$1
 DEST_DIR="./rewards/epoch=${EPOCH}"
+JSON_DIR="./json"
 TEMP_PARQUET="part.parquet.temp"
 FINAL_PARQUET="part.parquet"
-JSON_FILE="epoch_${EPOCH}.json"
+JSON_FILE="${JSON_DIR}/epoch_${EPOCH}.json"
+
+# Create destination folders
+mkdir -p "${JSON_DIR}"
+mkdir -p "${DEST_DIR}"
 
 # Download raw Trillium JSON
 echo "Fetching epoch ${EPOCH}..."
 curl -s -o "$JSON_FILE" "https://api.trillium.so/validator_rewards/${EPOCH}"
 
-# Create destination folder
-mkdir -p "${DEST_DIR}"
-
-# Convert to Parquet using DuckDB
+# Selectively extract useful fields (no aggregation)
 duckdb -c "
 COPY (
   SELECT
     epoch,
-    mev_to_validator + mev_to_stakers AS mev_reward,
-    validator_inflation_reward + delegator_inflation_reward +
-    validator_priority_fees + validator_signature_fees - vote_cost AS staking_reward
+    identity_pubkey,
+    validator_inflation_reward,
+    delegator_inflation_reward,
+    total_inflation_reward,
+    mev_to_validator,
+    mev_to_stakers,
+    mev_earned,
+    validator_priority_fees,
+    validator_signature_fees,
+    vote_cost,
+    rewards
   FROM read_json_auto('${JSON_FILE}')
 ) TO '${DEST_DIR}/${TEMP_PARQUET}' (FORMAT PARQUET);
 "
 
-# Atomically move it into place
+# Atomically move into place
 mv "${DEST_DIR}/${TEMP_PARQUET}" "${DEST_DIR}/${FINAL_PARQUET}"
 
-echo "Epoch ${EPOCH} processed."
+echo "Epoch ${EPOCH} imported to ${DEST_DIR}/${FINAL_PARQUET}"
