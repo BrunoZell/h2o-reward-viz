@@ -1,16 +1,13 @@
 {
-  "name": "frontend",
+  "name": "frontend-yarn",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^6.3.5"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "grpc-web": "^1.5.0",
-    "vite": "^6.3.5"
+    "vegafusion-wasm": "^2.0.2"
   }
 }
