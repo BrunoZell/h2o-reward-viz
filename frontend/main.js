@@ -9,12 +9,18 @@ const run = async () => {
   const client = new grpcWeb.GrpcWebClientBase({ format: "binary" });
   const send_message_grpc = makeGrpcSendMessageFn(client, hostname);
 
-  // Vega-Lite spec
+  // Sample data instead of using parquet files
+  const sampleData = [
+    { "epoch": 1, "mev_to_validator": 10, "mev_to_stakers": 20, "validator_inflation_reward": 5, "delegator_inflation_reward": 15, "validator_priority_fees": 3, "validator_signature_fees": 2, "vote_cost": 1 },
+    { "epoch": 2, "mev_to_validator": 15, "mev_to_stakers": 25, "validator_inflation_reward": 6, "delegator_inflation_reward": 18, "validator_priority_fees": 4, "validator_signature_fees": 3, "vote_cost": 1 },
+    { "epoch": 3, "mev_to_validator": 12, "mev_to_stakers": 22, "validator_inflation_reward": 7, "delegator_inflation_reward": 17, "validator_priority_fees": 5, "validator_signature_fees": 2, "vote_cost": 2 }
+  ];
+
+  // Vega-Lite spec with embedded data
   const spec = {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
     "data": {
-      "url": "rewards/epoch=*/part.parquet",
-      "format": { "type": "parquet" }
+      "values": sampleData
     },
     "transform": [
       { "calculate": "datum.mev_to_validator + datum.mev_to_stakers", "as": "mev" },
@@ -39,18 +45,35 @@ const run = async () => {
   };
 
   const config = {
-    verbose: false,
+    verbose: true, // Enable verbose mode for debugging
     debounce_wait: 30,
     debounce_max_wait: 60,
-    embed_opts: { mode: "vega-lite" }
+    embed_opts: { 
+      mode: "vega-lite", 
+      renderer: "svg", // Set explicit renderer
+      logLevel: 2 // Add log level for debugging
+    }
   };
 
   const element = document.getElementById("vega-chart");
   
-  // Use await with the vegaFusionEmbed call
-  const chart = await vegaFusionEmbed(element, spec, config, send_message_grpc);
-  console.log("Chart rendered successfully");
+  try {
+    // Use await with the vegaFusionEmbed call
+    console.log("Attempting to render chart with spec:", JSON.stringify(spec));
+    const chart = await vegaFusionEmbed(element, spec, config, send_message_grpc);
+    console.log("Chart rendered successfully");
+  } catch (error) {
+    console.error("Error rendering chart:", error);
+    // Try embedded runtime as fallback (without gRPC)
+    try {
+      console.log("Trying embedded runtime...");
+      const chart = await vegaFusionEmbed(element, spec, config);
+      console.log("Chart rendered successfully with embedded runtime");
+    } catch (fallbackError) {
+      console.error("Fallback rendering also failed:", fallbackError);
+    }
+  }
 };
 
 // Start the application
-run().catch(error => console.error("Error rendering chart:", error));
+run().catch(error => console.error("Startup error:", error));
