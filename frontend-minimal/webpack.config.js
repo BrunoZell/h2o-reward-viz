@@ -16,7 +16,8 @@ export default {
     port: 3000
   },
   experiments: {
-    asyncWebAssembly: true
+    asyncWebAssembly: true,
+    topLevelAwait: true
   },
   resolve: {
     fallback: {
@@ -25,13 +26,5 @@ export default {
       stream: 'stream-browserify',
       util: 'util/'
     }
-  },
-  module: {
-    rules: [
-      {
-        test: /\.wasm$/,
-        type: 'webassembly/async'
-      }
-    ]
   }
 };

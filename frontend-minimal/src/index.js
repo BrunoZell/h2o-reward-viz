@@ -1,7 +1,7 @@
-import embed from 'vega-embed';
-import { VegaFusionWasmClient } from 'vegafusion-wasm';
+import { vegaFusionEmbed, makeGrpcSendMessageFn } from 'vegafusion-wasm';
+import * as grpcWeb from 'grpc-web';
 
-const vlSpec = {
+const spec = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   data: {
     values: [
@@ -16,15 +16,22 @@ const vlSpec = {
   }
 };
 
-async function render() {
-  // Create the WASM client
-  const client = await VegaFusionWasmClient.create();
+const hostname = 'http://127.0.0.1:50051';
+const client = new grpcWeb.GrpcWebClientBase({ format: 'binary' });
+const send_message_grpc = makeGrpcSendMessageFn(client, hostname);
 
-  // Compile and evaluate using WASM
-  const { compiled_spec } = await client.compileAndEvaluate(vlSpec);
+const config = {
+  verbose: true,
+  debounce_wait: 30,
+  debounce_max_wait: 60,
+  embed_opts: {
+    mode: 'vega'
+  }
+};
 
-  // Use vega-embed to render
-  embed('#vis', compiled_spec);
-}
-
-render();
+await vegaFusionEmbed(
+  document.getElementById('vega-chart'),
+  spec,
+  config,
+  send_message_grpc
+);
