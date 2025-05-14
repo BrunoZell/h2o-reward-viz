@@ -56,6 +56,14 @@ $ ./vegafusion-server --host 127.0.0.1 --port 50051 --web --memory-limit 5242880
 RUST_LOG=debug ./vegafusion-server --host 127.0.0.1 --port 50051 --web --memory-limit 524288000
 ```
 
+### **Installation steps**
+
+```bash
+wget https://github.com/vega/vegafusion/releases/download/v2.0.2/vegafusion-server-linux-64.zip
+unzip vegafusion-server-linux-64.zip -d .
+chmod +x vegafusion-server
+```
+
 
 ## Web Client Build
 
