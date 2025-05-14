@@ -1,9 +1,11 @@
 import { vegaFusionEmbed, makeGrpcSendMessageFn } from 'vegafusion-wasm';
 import * as grpcWeb from 'grpc-web';
+import * as vegaLite from 'vega-lite';
 
 try {
-    console.log("Embedding chart...");
-  const spec = {
+  console.log("Embedding chart...");
+
+  const vegaLiteSpec = {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: {
       values: [
@@ -30,15 +32,11 @@ try {
       mode: 'vega'
     }
   };
-  
-  // await vegaFusionEmbed(
-  //   document.getElementById('vega-chart'),
-  //   spec,
-  //   config,
-  //   send_message_grpc
-  // );
-  const element = document.getElementById('vega-chart');
-  await vegaFusionEmbed(element, spec, config, send_message_grpc);
+
+  const vegaSpec = vegaLite.compile(vegaLiteSpec).spec;
+  const domElement = document.getElementById('vega-chart');
+  await vegaFusionEmbed(domElement, vegaSpec, config, send_message_grpc);
+
   console.log("Chart embedded successfully");
 } catch (err) {
   console.error("Failed to embed chart:", err);
