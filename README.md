@@ -8,4 +8,8 @@ $ ./vegafusion-server --host 127.0.0.1 --port 50051 --web --memory-limit 5242880
  ```
 
 
-Also copy vega_utils to `/frontend-minimal/node_modules/vegafusion-wasm/snippets/vegafusion-wasm-f7e76dd0896f3e00/js/vega_utils.js` for webpack to compile.
+Also copy vega_utils to `/frontend-minimal/node_modules/vegafusion-wasm/snippets/vegafusion-wasm-f7e76dd0896f3e00/js/vega_utils.js` for webpack to compile:
+
+```bash
+mkdir -p frontend-minimal/node_modules/vegafusion-wasm/snippets/vegafusion-wasm-f7e76dd0896f3e00/js && cp vega_utils.js frontend-minimal/node_modules/vegafusion-wasm/snippets/vegafusion-wasm-f7e76dd0896f3e00/js/vega_utils.js
+```
