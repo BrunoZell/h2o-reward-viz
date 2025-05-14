@@ -2,24 +2,28 @@ import { vegaFusionEmbed, makeGrpcSendMessageFn } from 'vegafusion-wasm';
 import * as grpcWeb from 'grpc-web';
 import * as vegaLite from 'vega-lite';
 
+const vegaLiteSpec = {
+  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+  data: {
+    url: 'file:rewards/',
+    format: {
+      type: 'parquet',
+      backend: 'datafusion'
+    }
+  },
+  transform: [
+    { calculate: 'datum.total_inflation_reward', as: 'noop' }  // ✅ server-compatible
+  ],
+  mark: 'bar',
+  encoding: {
+    x: { field: 'epoch', type: 'ordinal', sort: 'ascending' },
+    y: { field: 'total_inflation_reward', type: 'quantitative' }
+  }
+};
+
 try {
   console.log("Embedding chart...");
 
-  const vegaLiteSpec = {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: {
-      values: [
-        { category: 'A', amount: 30 },
-        { category: 'B', amount: 55 }
-      ]
-    },
-    mark: 'bar',
-    encoding: {
-      x: { field: 'category', type: 'ordinal' },
-      y: { field: 'amount', type: 'quantitative' }
-    }
-  };
-  
   const hostname = 'http://127.0.0.1:50051';
   const client = new grpcWeb.GrpcWebClientBase({ format: 'binary' });
   const send_message_grpc = makeGrpcSendMessageFn(client, hostname);
