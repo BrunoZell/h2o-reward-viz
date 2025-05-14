@@ -26,5 +26,14 @@ export default {
       stream: 'stream-browserify',
       util: 'util/'
     }
+  },
+  devServer: {
+    static: './public',
+    port: 3000,
+    hot: false,        // 🔕 Disable Hot Module Replacement
+    client: {
+      logging: 'none', // 🔕 Suppress client log output in browser
+      overlay: false   // 🔕 Don't show error overlay in browser
+    }
   }
 };
