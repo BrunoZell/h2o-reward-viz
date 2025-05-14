@@ -50,6 +50,12 @@ This limits the Cache to 500MB:
 $ ./vegafusion-server --host 127.0.0.1 --port 50051 --web --memory-limit 524288000
  ```
 
+ Or with logging:
+
+```bash
+RUST_LOG=debug ./vegafusion-server --host 127.0.0.1 --port 50051 --web --memory-limit 524288000
+```
+
 
 ## Web Client Build
 
