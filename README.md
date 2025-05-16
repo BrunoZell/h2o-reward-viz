@@ -140,9 +140,54 @@ SELECT * FROM read_parquet('/rewards/epoch=*/part.parquet');
 
 ---
 
-## ✅ Why This Is Great
+## ✅ Why This Architecture Is Great
 
-* 🧱 **Append-friendly**: Just drop a new folder+file
-* ⚡ **Safe for concurrent reads**: Existing files are never changed
-* 🤖 **Easy automation**: Each file is a standalone artifact
-* 🧹 **Easy cleanup**: Delete `epoch=XXX/` to remove a row group
+This design leverages simple, robust tools in combination to create a maintainable and efficient data pipeline. Here’s why it works so well:
+
+### 🧱 **Append-Only File Layout**
+
+* Each epoch is written once to `epoch=XXX/part.parquet`
+* Easy to reason about: no mutable global state
+* Enables atomic updates (write to temp, then `mv` into place)
+
+### ⚡ **Safe for Concurrent Reads**
+
+* DuckDB’s `read_parquet` supports globbing and partitions
+* Query performance scales naturally with the number of epochs
+* No write locks or risk of corruption while reading
+
+### 🤖 **Automated and Fully Headless**
+
+* `systemd` handles scheduling, crash recovery, and boot persistence
+* No cron or external workflow engine required
+* Easy to restart, inspect, and manage with familiar Linux tools
+
+### 🧩 **Modular by Design**
+
+* Every step is isolated and scriptable (`fetch`, `query`, `build`, `serve`)
+* Easy to test or replace individual components
+* You can substitute the data source or chart engine with minimal impact
+
+### 📈 **Frontend-Ready and Self-Contained**
+
+* The final chart (`h2o-latest.json`) is fully embedded and ready to render
+* Compatible with `vegaEmbed`, CDN-hosted Vega.js, or static-site hosting
+* React frontend is decoupled from pipeline complexity
+
+### 🔁 **Incremental and Backfillable**
+
+* New data is added incrementally (e.g., `epoch 791`)
+* Missing epochs can be fetched later without special logic
+* Backfilling or reprocessing is as simple as re-running `fetch_epoch.sh`
+
+### 🧹 **Easy Cleanup and Archival**
+
+* Delete a folder to remove data
+* Archive old epochs by zipping `epoch=XXX/`
+* Storage stays predictable and segmentable
+
+### 📦 **DuckDB as the Embedded Engine**
+
+* No running services, no admin — just one binary
+* Fast SQL over Parquet with zero setup
+* Scales vertically and performs like a real OLAP engine
