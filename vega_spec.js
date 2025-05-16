@@ -66,7 +66,8 @@ function vegaSpec(dataset) {
         "legend": {
           "title": "Reward Type",
           "titleColor": "#EEEEEE",
-          "labelColor": "#CCCCCC"
+          "labelColor": "#CCCCCC",
+          "labelExpr": "datum.value === 'rewards' ? 'VR' : datum.value === 'mev_earned' ? 'MEV' : datum.value"
         }
       },
       "tooltip": [
