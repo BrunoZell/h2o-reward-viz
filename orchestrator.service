@@ -1,0 +1,16 @@
+[Unit]
+Description=H2O Epoch Orchestrator
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/bruno/solviz/orchestrator.sh
+WorkingDirectory=/home/bruno/solviz
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/h2o-orchestrator.log
+StandardError=append:/var/log/h2o-orchestrator.log
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
