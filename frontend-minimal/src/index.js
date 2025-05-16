@@ -3,23 +3,23 @@ import * as grpcWeb from 'grpc-web';
 import * as vegaLite from 'vega-lite';
 
 const vegaLiteSpec = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-  data: {
-    url: 'file:rewards/',
-    format: {
-      type: 'parquet',
-      backend: 'datafusion'
+    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+    data: {
+      url: 'file:rewards/epoch=*/part.parquet',
+      format: {
+        type: 'parquet'
+      }
+    },
+    transform: [
+      { calculate: "datum.epoch", as: "noop" }  // Any transform triggers server-side TaskGraph
+    ],
+    mark: 'bar',
+    encoding: {
+      x: { field: 'epoch', type: 'ordinal', sort: 'ascending' },
+      y: { field: 'total_inflation_reward', type: 'quantitative' }
     }
-  },
-  transform: [
-    { calculate: 'datum.total_inflation_reward', as: 'noop' }  // ✅ server-compatible
-  ],
-  mark: 'bar',
-  encoding: {
-    x: { field: 'epoch', type: 'ordinal', sort: 'ascending' },
-    y: { field: 'total_inflation_reward', type: 'quantitative' }
-  }
-};
+  };
+  
 
 try {
   console.log("Embedding chart...");
