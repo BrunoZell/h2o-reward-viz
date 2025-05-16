@@ -36,21 +36,21 @@ COPY (
   SELECT
     epoch,
     identity_pubkey,
-    validator_inflation_reward,
-    delegator_inflation_reward,
-    total_inflation_reward,
-    mev_to_validator,
-    mev_to_stakers,
-    mev_earned,
-    validator_priority_fees,
-    validator_signature_fees,
-    mev_to_jito_block_engine,
-    mev_to_jito_tip_router,
-    mev_commission,
-    total_block_rewards_after_burn,
-    total_block_rewards_before_burn,
-    vote_cost,
-    rewards
+    CAST(validator_inflation_reward AS DOUBLE) AS validator_inflation_reward,
+    CAST(delegator_inflation_reward AS DOUBLE) AS delegator_inflation_reward,
+    CAST(total_inflation_reward AS DOUBLE) AS total_inflation_reward,
+    CAST(mev_to_validator AS DOUBLE) AS mev_to_validator,
+    CAST(mev_to_stakers AS DOUBLE) AS mev_to_stakers,
+    CAST(mev_earned AS DOUBLE) AS mev_earned,
+    CAST(validator_priority_fees AS DOUBLE) AS validator_priority_fees,
+    CAST(validator_signature_fees AS DOUBLE) AS validator_signature_fees,
+    CAST(mev_to_jito_block_engine AS DOUBLE) AS mev_to_jito_block_engine,
+    CAST(mev_to_jito_tip_router AS DOUBLE) AS mev_to_jito_tip_router,
+    CAST(mev_commission AS DOUBLE) AS mev_commission,
+    CAST(total_block_rewards_after_burn AS DOUBLE) AS total_block_rewards_after_burn,
+    CAST(total_block_rewards_before_burn AS DOUBLE) AS total_block_rewards_before_burn,
+    CAST(vote_cost AS DOUBLE) AS vote_cost,
+    CAST(rewards AS DOUBLE) AS rewards
   FROM read_json_auto('${JSON_FILE}')
 ) TO '${TEMP_DIR}/${PARQUET_FILE}' (FORMAT PARQUET);
 "
