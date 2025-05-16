@@ -5,9 +5,13 @@
   "author": "Bruno <ask@bruno.wtf>",
   "license": "MIT",
   "scripts": {
-    "generate": "node generate_vega.js"
+    "generate": "node generate_vega.js",
+    "watch": "nodemon --watch vega_spec.js --exec \"node generate_vega.js\""
   },
   "dependencies": {
     "duckdb": "^1.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
