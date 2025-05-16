@@ -1,5 +1,32 @@
 # H20Viz
 
+## Query DuckDB
+
+Reads all stacking reward records of the H2O validator node:
+
+```bash
+duckdb -c "
+SELECT
+  epoch,
+  identity_pubkey,
+  validator_inflation_reward,
+  delegator_inflation_reward,
+  total_inflation_reward,
+  mev_to_validator,
+  mev_to_stakers,
+  mev_earned,
+  validator_priority_fees,
+  validator_signature_fees,
+  vote_cost,
+  rewards
+FROM read_parquet('rewards/epoch=*/part.parquet')
+WHERE identity_pubkey = '9pBHfuE19q7PRbupJf8CZAMwv6RHjasdyMN9U9du7Nx2'
+ORDER BY epoch;
+"
+```
+
+
+
 ## Download Validator Data
 
 ```bash
