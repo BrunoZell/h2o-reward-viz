@@ -10,30 +10,25 @@ const __dirname = path.dirname(__filename);
 
 const db = new duckdb.Database(':memory:');
 const SQL = `
-  SELECT epoch, total_inflation_reward, mev_to_validator, vote_cost
+  SELECT 
+    epoch, 
+    mev_earned,
+    rewards
   FROM read_parquet('rewards/epoch=*/part.parquet')
   WHERE identity_pubkey = '9pBHfuE19q7PRbupJf8CZAMwv6RHjasdyMN9U9du7Nx2'
-  ORDER BY epoch
-  LIMIT 10
+  ORDER BY epoch DESC
+  LIMIT 50
 `;
 
 db.all(SQL, (err, rows) => {
   if (err) throw err;
 
-  // Convert BigInts to Numbers and prepare data for stacked bar chart
-  const dataset = rows.map(row => {
-    const epochNum = Number(row.epoch);
-    
-    // Convert lamports to SOL
-    const vr = Number(row.total_inflation_reward) / 1000000000;
-    const mev = Number(row.mev_to_validator) / 1000000000;
-    
-    return {
-      epoch: epochNum,
-      VR: vr,
-      MEV: mev
-    };
-  });
+  // Pass data directly to the Vega spec
+  const dataset = rows.map(row => ({
+    epoch: Number(row.epoch),
+    mev_earned: row.mev_earned,
+    rewards: row.rewards
+  }));
 
   // Generate the Vega-Lite spec
   const vegaLiteSpec = vegaSpecFn(dataset);
