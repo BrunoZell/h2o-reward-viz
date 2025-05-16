@@ -15,7 +15,7 @@ function vegaSpec(dataset) {
     },
     "transform": [
       {
-        "fold": ["VR", "MEV"],
+        "fold": ["rewards", "mev_earned"],
         "as": ["Reward Type", "Value"]
       }
     ],
@@ -48,7 +48,7 @@ function vegaSpec(dataset) {
         "field": "Reward Type",
         "type": "nominal",
         "scale": {
-          "domain": ["VR", "MEV"],
+          "domain": ["rewards", "mev_earned"],
           "range": ["#5546FF", "#FF4672"]
         },
         "legend": {
