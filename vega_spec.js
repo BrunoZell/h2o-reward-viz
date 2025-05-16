@@ -1,115 +1,77 @@
 /**
- * Generate a Vega specification for validator rewards visualization
+ * Generate a Vega-Lite specification for validator rewards visualization
  * @param {Array} dataset - Array of reward data objects
- * @returns {Object} - Vega specification object
+ * @returns {Object} - Vega-Lite specification object
  */
 function vegaSpec(dataset) {
   return {
-    "$schema": "https://vega.github.io/schema/vega/v6.json",
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
     "description": "Validator Rewards per Epoch",
     "width": 800,
     "height": 400,
-    "autosize": { "type": "fit", "contains": "padding" },
-    "padding": 10,
     "background": "#1A1A1A",
-    
-    "data": [
+    "data": {
+      "values": dataset
+    },
+    "transform": [
       {
-        "name": "rewards",
-        "values": dataset
+        "fold": ["VR", "MEV"],
+        "as": ["Reward Type", "Value"]
       }
     ],
-    
-    "scales": [
-      {
-        "name": "xscale",
-        "type": "band",
-        "domain": {"data": "rewards", "field": "epoch"},
-        "range": "width",
-        "padding": 0.1
-      },
-      {
-        "name": "yscale",
-        "type": "linear",
-        "domain": {"data": "rewards", "field": "rewards"},
-        "range": "height",
-        "nice": true,
-        "zero": true
-      }
-    ],
-    
-    "axes": [
-      {
-        "orient": "bottom",
-        "scale": "xscale",
+    "mark": "bar",
+    "encoding": {
+      "x": {
+        "field": "epoch",
+        "type": "ordinal",
         "title": "Epoch",
-        "titleColor": "#EEEEEE",
-        "labelColor": "#CCCCCC",
-        "grid": false,
-        "domain": true
+        "axis": {
+          "titleColor": "#EEEEEE",
+          "labelColor": "#CCCCCC",
+          "grid": false
+        }
       },
-      {
-        "orient": "left",
-        "scale": "yscale",
+      "y": {
+        "field": "Value",
+        "type": "quantitative",
         "title": "SOL Rewards",
-        "titleColor": "#EEEEEE",
-        "labelColor": "#CCCCCC",
-        "grid": true,
-        "gridColor": "#333333",
-        "format": ".8f"
-      }
-    ],
-    
-    "signals": [
-      {
-        "name": "tooltip",
-        "value": {},
-        "on": [
-          {"events": "rect:mouseover", "update": "datum"},
-          {"events": "rect:mouseout", "update": "{}"}
-        ]
-      }
-    ],
-    
-    "marks": [
-      {
-        "type": "rect",
-        "from": {"data": "rewards"},
-        "encode": {
-          "enter": {
-            "x": {"scale": "xscale", "field": "epoch"},
-            "width": {"scale": "xscale", "band": 1},
-            "y": {"scale": "yscale", "field": "rewards"},
-            "y2": {"scale": "yscale", "value": 0},
-            "fill": {"value": "#5546FF"}
-          },
-          "hover": {
-            "fill": {"value": "#6E61FF"}
-          }
+        "stack": "zero",
+        "axis": {
+          "titleColor": "#EEEEEE",
+          "labelColor": "#CCCCCC",
+          "grid": true,
+          "gridColor": "#333333",
+          "format": ".8f"
         }
       },
-      {
-        "type": "text",
-        "encode": {
-          "enter": {
-            "align": {"value": "center"},
-            "baseline": {"value": "bottom"},
-            "fill": {"value": "#EEEEEE"}
-          },
-          "update": {
-            "x": {"scale": "xscale", "signal": "tooltip.epoch", "band": 0.5},
-            "y": {"scale": "yscale", "signal": "tooltip.rewards", "offset": -5},
-            "text": {
-              "signal": "tooltip.rewards ? format(tooltip.rewards, '.8f') : ''"
-            },
-            "fillOpacity": { "signal": "tooltip.rewards ? 1 : 0" }
-          }
+      "color": {
+        "field": "Reward Type",
+        "type": "nominal",
+        "scale": {
+          "domain": ["VR", "MEV"],
+          "range": ["#5546FF", "#FF4672"]
+        },
+        "legend": {
+          "title": "Reward Type",
+          "titleColor": "#EEEEEE",
+          "labelColor": "#CCCCCC"
         }
+      },
+      "tooltip": [
+        {"field": "epoch", "type": "ordinal", "title": "Epoch"},
+        {"field": "Reward Type", "type": "nominal"},
+        {"field": "Value", "type": "quantitative", "format": ".8f", "title": "Reward"}
+      ]
+    },
+    "config": {
+      "view": {
+        "stroke": "transparent"
+      },
+      "bar": {
+        "strokeWidth": 0
       }
-    ],
-    
-    "legends": []
+    }
   };
 }
 
-module.exports = vegaSpec; 
+export default vegaSpec; 
