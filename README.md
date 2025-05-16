@@ -1,5 +1,7 @@
 # H2O Validator Rewards Visualization
 
+![How it looks](docs/chart.png)
+
 ## 🧱 System Architecture Overview
 
 This repository implements a full data pipeline for visualizing Solana validator reward data as a Vega chart, rendered in a React web frontend. All components run on a single Linux host, managed via `systemd`. It focusses on a single validator _H2O_.
