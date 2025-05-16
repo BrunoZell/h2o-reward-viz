@@ -22,17 +22,22 @@ get_last_stored_epoch() {
 }
 
 current_mainnet_epoch=$(get_current_epoch)
-last_fetched_epoch=$(get_last_stored_epoch)
+last_fetched_epoch=$(get_last_stored_epoch | grep -Eo '^[0-9]+$' || echo 600)
 
 echo "Current mainnet epoch: $current_mainnet_epoch"
 echo "Last fetched epoch: $last_fetched_epoch"
 
-if [ "$current_mainnet_epoch" -gt "$last_fetched_epoch" ]; then
-  echo "Epoch has advanced from $last_fetched_epoch to $current_mainnet_epoch"
-  for ((e=last_fetched_epoch+1; e<=current_mainnet_epoch; e++)); do
+# Only fetch completed epochs (exclude current active epoch)
+target_epoch=$((current_mainnet_epoch - 1))
+
+if [ "$target_epoch" -gt "$last_fetched_epoch" ]; then
+  echo "Epoch has advanced from $last_fetched_epoch to $target_epoch"
+  for ((e=last_fetched_epoch+1; e<=target_epoch; e++)); do
     echo "Fetching epoch $e"
-    bash "$SCRIPT_TO_TRIGGER" "$e"
+    if ! bash "$SCRIPT_TO_TRIGGER" "$e"; then
+      echo "⚠️ Fetching epoch $e failed — continuing..."
+    fi
   done
 else
-  echo "No new epochs. Current: $current_mainnet_epoch, Last stored: $last_fetched_epoch"
+  echo "No completed new epochs to fetch."
 fi
