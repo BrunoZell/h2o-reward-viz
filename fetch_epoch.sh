@@ -44,6 +44,11 @@ COPY (
     mev_earned,
     validator_priority_fees,
     validator_signature_fees,
+    mev_to_jito_block_engine,
+    mev_to_jito_tip_router,
+    mev_commission,
+    total_block_rewards_after_burn,
+    total_block_rewards_before_burn,
     vote_cost,
     rewards
   FROM read_json_auto('${JSON_FILE}')
