@@ -56,7 +56,7 @@ function vegaSpec(dataset) {
         "labelColor": "#CCCCCC",
         "grid": true,
         "gridColor": "#333333",
-        "format": ".4f"
+        "format": ".8f"
       }
     ],
     
