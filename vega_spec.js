@@ -17,6 +17,18 @@ function vegaSpec(dataset) {
       {
         "fold": ["rewards", "mev_earned"],
         "as": ["Reward Type", "Value"]
+      },
+      {
+        "joinaggregate": [{
+          "op": "sum",
+          "field": "Value",
+          "as": "TotalPerEpoch"
+        }],
+        "groupby": ["epoch"]
+      },
+      {
+        "calculate": "datum.Value / datum.TotalPerEpoch * 100",
+        "as": "PercentOfTotal"
       }
     ],
     "mark": "bar",
@@ -41,7 +53,7 @@ function vegaSpec(dataset) {
           "labelColor": "#CCCCCC",
           "grid": true,
           "gridColor": "#333333",
-          "format": ".8f"
+          "format": ".2f"
         }
       },
       "color": {
@@ -60,7 +72,8 @@ function vegaSpec(dataset) {
       "tooltip": [
         {"field": "epoch", "type": "ordinal", "title": "Epoch"},
         {"field": "Reward Type", "type": "nominal"},
-        {"field": "Value", "type": "quantitative", "format": ".8f", "title": "Reward"}
+        {"field": "Value", "type": "quantitative", "format": ".2f", "title": "Reward"},
+        {"field": "PercentOfTotal", "type": "quantitative", "format": ".1f", "title": "% of Total", "suffix": "%"}
       ]
     },
     "config": {
