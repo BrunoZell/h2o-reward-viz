@@ -100,7 +100,7 @@ function vegaSpec(dataset) {
             "x": {"scale": "xscale", "signal": "tooltip.epoch", "band": 0.5},
             "y": {"scale": "yscale", "signal": "tooltip.rewards", "offset": -5},
             "text": {
-              "signal": "tooltip.rewards ? format(tooltip.rewards, '.6f') : ''"
+              "signal": "tooltip.rewards ? format(tooltip.rewards, '.8f') : ''"
             },
             "fillOpacity": { "signal": "tooltip.rewards ? 1 : 0" }
           }
