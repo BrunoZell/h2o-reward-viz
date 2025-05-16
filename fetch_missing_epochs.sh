@@ -32,12 +32,27 @@ target_epoch=$((current_mainnet_epoch - 1))
 
 if [ "$target_epoch" -gt "$last_fetched_epoch" ]; then
   echo "Epoch has advanced from $last_fetched_epoch to $target_epoch"
-  for ((e=last_fetched_epoch+1; e<=target_epoch; e++)); do
+
+  # Track whether any new data was imported
+  any_fetched=false
+
+  for ((e = last_fetched_epoch + 1; e <= target_epoch; e++)); do
     echo "Fetching epoch $e"
-    if ! bash "$SCRIPT_TO_TRIGGER" "$e"; then
+    if bash "$SCRIPT_TO_TRIGGER" "$e"; then
+      any_fetched=true
+    else
       echo "⚠️ Fetching epoch $e failed — continuing..."
     fi
   done
+
+  if [ "$any_fetched" = true ]; then
+    echo "✅ New data imported — generating Vega spec"
+    mkdir -p ./charts
+    if ! node generate_vega.js >./charts/latest_vega.json; then
+      echo "❌ Failed to generate Vega spec — continuing anyway"
+    fi
+  fi
+
 else
   echo "No completed new epochs to fetch."
 fi
