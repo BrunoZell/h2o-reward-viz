@@ -44,7 +44,7 @@ db.all(SQL, (err, rows) => {
   
   // Write to h2o-latest.json file (Vega spec)
   const outputFile = path.join(outputDir, 'h2o-latest.json');
-  fs.writeFileSync(outputFile, JSON.stringify(vegaSpec, null, 2));
+  fs.writeFileSync(outputFile, JSON.stringify(vegaSpec));
   
   console.log(`Vega spec written to ${outputFile}`);
 });
