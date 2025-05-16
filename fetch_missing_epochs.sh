@@ -48,8 +48,10 @@ if [ "$target_epoch" -gt "$last_fetched_epoch" ]; then
   if [ "$any_fetched" = true ]; then
     echo "✅ New data imported — generating Vega spec"
     mkdir -p ./charts
-    if ! node generate_vega.js >./charts/latest_vega.json; then
+    if ! node generate_vega.js; then
       echo "❌ Failed to generate Vega spec — continuing anyway"
+    else
+      echo "✅ Vega spec generated at ./charts/h2o-latest.json"
     fi
   fi
 
