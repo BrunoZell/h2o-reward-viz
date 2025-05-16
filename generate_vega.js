@@ -26,8 +26,8 @@ db.all(SQL, (err, rows) => {
   // Pass data directly to the Vega spec
   const dataset = rows.map(row => ({
     epoch: Number(row.epoch),
-    mev_earned: row.mev_earned,
-    rewards: row.rewards
+    mev_earned: Number(row.mev_earned),
+    rewards: Number(row.rewards)
   }));
 
   // Generate the Vega-Lite spec
