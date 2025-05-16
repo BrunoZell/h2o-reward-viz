@@ -9,17 +9,28 @@ FINAL_DIR="${DEST_BASE}/epoch=${EPOCH}"
 TEMP_DIR="${DEST_BASE}/epoch=${EPOCH}.tmp"
 JSON_FILE="${JSON_DIR}/epoch_${EPOCH}.json"
 PARQUET_FILE="part.parquet"
+TEMP_JSON=$(mktemp)
 
-# Create necessary temp dirs
+# Ensure JSON folder exists
 mkdir -p "$JSON_DIR"
+
+# Fetch JSON with status check
+echo "Fetching epoch ${EPOCH}..."
+HTTP_STATUS=$(curl -s -w "%{http_code}" -o "$TEMP_JSON" "https://api.trillium.so/validator_rewards/${EPOCH}")
+
+if [ "$HTTP_STATUS" != "200" ]; then
+  echo "⚠️ Epoch ${EPOCH} not available (HTTP $HTTP_STATUS) — skipping."
+  rm -f "$TEMP_JSON"
+  exit 0
+fi
+
+# Save valid JSON
+mv "$TEMP_JSON" "$JSON_FILE"
+
+# Write to Parquet in a temp directory
 rm -rf "$TEMP_DIR"
 mkdir -p "$TEMP_DIR"
 
-# Download Trillium JSON
-echo "Fetching epoch ${EPOCH}..."
-curl -s -o "$JSON_FILE" "https://api.trillium.so/validator_rewards/${EPOCH}"
-
-# Write to Parquet in temp dir
 duckdb -c "
 COPY (
   SELECT
@@ -39,7 +50,7 @@ COPY (
 ) TO '${TEMP_DIR}/${PARQUET_FILE}' (FORMAT PARQUET);
 "
 
-# Atomically rename temp dir to final epoch dir
+# Atomic rename
 mv "$TEMP_DIR" "$FINAL_DIR"
 
-echo "Epoch ${EPOCH} imported to ${FINAL_DIR}/${PARQUET_FILE}"
+echo "✅ Epoch ${EPOCH} imported to ${FINAL_DIR}/${PARQUET_FILE}"
