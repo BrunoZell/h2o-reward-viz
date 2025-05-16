@@ -1,0 +1,11 @@
+server {
+    listen 80;
+    server_name localhost semantic.bet;
+
+    root /var/www/semantic.bet;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
