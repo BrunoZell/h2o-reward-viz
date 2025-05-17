@@ -11,6 +11,12 @@ JSON_FILE="${JSON_DIR}/epoch_${EPOCH}.json"
 PARQUET_FILE="part.parquet"
 TEMP_JSON=$(mktemp)
 
+# Check if epoch data already exists
+if [ -f "${FINAL_DIR}/${PARQUET_FILE}" ]; then
+  echo "✅ Epoch ${EPOCH} already exists at ${FINAL_DIR}/${PARQUET_FILE} — skipping."
+  exit 0
+fi
+
 # Ensure JSON folder exists
 mkdir -p "$JSON_DIR"
 
@@ -33,7 +39,7 @@ mkdir -p "$TEMP_DIR"
 
 duckdb -c "
 COPY (
-  SELECT
+  SELECT DISTINCT ON (epoch, identity_pubkey)
     epoch,
     identity_pubkey,
     CAST(validator_inflation_reward AS DOUBLE) AS validator_inflation_reward,
