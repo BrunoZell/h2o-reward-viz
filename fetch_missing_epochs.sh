@@ -16,7 +16,7 @@ get_last_stored_epoch() {
   duckdb -c "
     COPY (
       SELECT MAX(epoch)
-      FROM read_parquet('${REWARDS_DIR}/epoch=*/part.parquet')
+      FROM read_parquet('${REWARDS_DIR}/epoch=[0-9]*/part.parquet')
     ) TO STDOUT (FORMAT CSV, HEADER FALSE);
   "
 }
