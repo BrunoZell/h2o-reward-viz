@@ -11,6 +11,12 @@ JSON_FILE="${JSON_DIR}/epoch_${EPOCH}.json"
 PARQUET_FILE="part.parquet"
 TEMP_JSON=$(mktemp)
 
+# Clean up any leftover temp directory for this epoch
+if [ -d "$TEMP_DIR" ]; then
+  echo "🧹 Cleaning up leftover temp directory: $TEMP_DIR"
+  rm -rf "$TEMP_DIR"
+fi
+
 # Check if epoch data already exists
 if [ -f "${FINAL_DIR}/${PARQUET_FILE}" ]; then
   echo "✅ Epoch ${EPOCH} already exists at ${FINAL_DIR}/${PARQUET_FILE} — skipping."
@@ -63,5 +69,10 @@ COPY (
 
 # Atomic rename
 mv "$TEMP_DIR" "$FINAL_DIR"
+
+# Clean up temp directory if it somehow still exists (redundant but safe)
+if [ -d "$TEMP_DIR" ]; then
+  rm -rf "$TEMP_DIR"
+fi
 
 echo "✅ Epoch ${EPOCH} imported to ${FINAL_DIR}/${PARQUET_FILE}"
