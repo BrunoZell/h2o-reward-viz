@@ -14,7 +14,7 @@ const SQL = `
     epoch, 
     mev_earned,
     rewards
-  FROM read_parquet('rewards/epoch=[0-9]*/part.parquet')
+  FROM read_parquet('rewards/epoch=[0-9]*[0-9]/part.parquet')
   WHERE identity_pubkey = '9pBHfuE19q7PRbupJf8CZAMwv6RHjasdyMN9U9du7Nx2'
   ORDER BY epoch DESC
   LIMIT 50
