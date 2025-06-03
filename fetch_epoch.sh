@@ -5,8 +5,9 @@ set -euo pipefail
 EPOCH=$1
 JSON_DIR="./json"
 DEST_BASE="./rewards"
+TEMP_BASE="./rewards-tmp"
 FINAL_DIR="${DEST_BASE}/epoch=${EPOCH}"
-TEMP_DIR="${DEST_BASE}/epoch=${EPOCH}.tmp"
+TEMP_DIR="${TEMP_BASE}/epoch=${EPOCH}"
 JSON_FILE="${JSON_DIR}/epoch_${EPOCH}.json"
 PARQUET_FILE="part.parquet"
 TEMP_JSON=$(mktemp)
@@ -23,8 +24,9 @@ if [ -f "${FINAL_DIR}/${PARQUET_FILE}" ]; then
   exit 0
 fi
 
-# Ensure JSON folder exists
+# Ensure directories exist
 mkdir -p "$JSON_DIR"
+mkdir -p "$TEMP_BASE"
 
 # Fetch JSON with status check
 echo "Fetching epoch ${EPOCH}..."
@@ -69,10 +71,5 @@ COPY (
 
 # Atomic rename
 mv "$TEMP_DIR" "$FINAL_DIR"
-
-# Clean up temp directory if it somehow still exists (redundant but safe)
-if [ -d "$TEMP_DIR" ]; then
-  rm -rf "$TEMP_DIR"
-fi
 
 echo "✅ Epoch ${EPOCH} imported to ${FINAL_DIR}/${PARQUET_FILE}"
