@@ -12,12 +12,6 @@ JSON_FILE="${JSON_DIR}/epoch_${EPOCH}.json"
 PARQUET_FILE="part.parquet"
 TEMP_JSON=$(mktemp)
 
-# Clean up any leftover temp directory for this epoch
-if [ -d "$TEMP_DIR" ]; then
-  echo "🧹 Cleaning up leftover temp directory: $TEMP_DIR"
-  rm -rf "$TEMP_DIR"
-fi
-
 # Check if epoch data already exists
 if [ -f "${FINAL_DIR}/${PARQUET_FILE}" ]; then
   echo "✅ Epoch ${EPOCH} already exists at ${FINAL_DIR}/${PARQUET_FILE} — skipping."
@@ -41,10 +35,11 @@ fi
 # Save valid JSON
 mv "$TEMP_JSON" "$JSON_FILE"
 
-# Write to Parquet in a temp directory
+# Clean up any existing temp directory and create fresh one
 rm -rf "$TEMP_DIR"
 mkdir -p "$TEMP_DIR"
 
+# Write to Parquet in a temp directory
 duckdb -c "
 COPY (
   SELECT DISTINCT ON (epoch, identity_pubkey)
@@ -69,7 +64,10 @@ COPY (
 ) TO '${TEMP_DIR}/${PARQUET_FILE}' (FORMAT PARQUET);
 "
 
-# Atomic rename
+# Ensure clean target for atomic rename
+rm -rf "$FINAL_DIR"
+
+# Atomic rename: directory appears instantly with all contents
 mv "$TEMP_DIR" "$FINAL_DIR"
 
 echo "✅ Epoch ${EPOCH} imported to ${FINAL_DIR}/${PARQUET_FILE}"
